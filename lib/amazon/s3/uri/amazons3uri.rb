@@ -1,5 +1,5 @@
 require 'uri'
-
+# Refer https://github.com/aws/aws-sdk-java/blob/master/aws-java-sdk-s3/src/main/java/com/amazonaws/services/s3/AmazonS3URI.java
 module Amazon
   module S3
     module Uri
@@ -15,6 +15,16 @@ module Amazon
           @host = @uri.host
           if @host.nil?
             raise ArgumentError.new("Invalid S3 URI: no hostname: " + url)
+          end
+
+          if "s3".casecmp(uri.scheme) == 0
+            @region = nil
+            @isPathStyle = false
+            @bucket = uri.host
+            if @bucket.nil?
+              raise ArgumentError.new("Invalid S3 URI: no bucket: " + url)
+            end
+            return
           end
 
           matches = ENDPOINT_PATTERN.match(@host)
